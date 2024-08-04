@@ -29,31 +29,9 @@ def preProcessing(img):
     kernel = np.ones((3, 3), np.uint8)
     imgPre = cv2.dilate(imgPre, kernel, iterations=1)
     imgPre = cv2.morphologyEx(imgPre, cv2.MORPH_CLOSE, kernel)
-    imgContours, conFound = cv2.findContours(imgPre, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    return imgPre, imgContours
+    return imgPre
 
 
-def drawCircleAndSquare(img, contour):
-    # Find the minimum enclosing circle
-    (x, y), radius = cv2.minEnclosingCircle(contour)
-    center = (int(x), int(y))
-    radius = int(radius)
-
-    # Draw the circle
-    cv2.circle(img, center, radius, (0, 255, 0), 2)
-
-    # Calculate square dimensions around the circle
-    square_size = radius * 2
-    x1 = int(x - radius)
-    y1 = int(y - radius)
-    x2 = x1 + square_size
-    y2 = y1 + square_size
-
-    # Draw the square
-    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-
-    # Return center point for further use if needed
-    return center
 
 
 while True:
