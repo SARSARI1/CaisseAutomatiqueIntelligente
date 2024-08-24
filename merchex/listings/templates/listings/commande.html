@@ -104,39 +104,48 @@
             <div class="col-lg-9 col-md-8">
                 <div class="d-flex justify-content-between mb-4">
                     <h2 class="mb-0">Liste des Commandes</h2>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSaleModal">Ajouter Nouvelle Commande</button>
+                    
                 </div>
                 <div class="mb-4">
                     <input type="text" class="form-control" id="searchSales" placeholder="Rechercher des ventes...">
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Travailleur</th>
-                            <th>Client</th>
-                            <th>Montant Total</th>
-                            <th>Montant Payé</th>
-                            <th>Date de Vente</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Example Sale Row -->
-                        <tr>
-                            <td>Travailleur 1</td>
-                            <td>Client 1</td>
-                            <td>100.00 €</td>
-                            <td>120.00 €</td>
-                            <td>2024-08-14 12:00:00</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSaleModal" data-id="1">Modifier</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSaleModal" data-id="1">Supprimer</button>
-                            </td>
-                        </tr>
-                        <!-- Repeat for other sales -->
-                    </tbody>
-                </table>
-                <button class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#deleteAllSalesModal">Supprimer Toutes les Commandes</button>
+                {% if ventes %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Client</th>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Prix Unitaire</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vente in ventes %}
+                                {% for article in vente.articles.all %}
+                                    <tr>
+                                        <td>{{ vente.date_vente }}</td>
+                                        <td>{{ vente.client.nom }} {{ vente.client.prenom }}</td>
+                                        <td>{{ article.produit.nom }}</td>
+                                        <td>{{ article.quantite }}</td>
+                                        <td>{{ article.prix }}</td>
+                                        <td>{{ article.quantite|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        Aucune commande trouvée.
+                    </div>
+                {% endif %}
+
+                
+               <!-- Button to trigger the modal -->
+               <button class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#deleteAllSalesModal">Supprimer Toutes les Commandes</button>
+
             </div>
             <!-- Sales Records End -->
         </div>
@@ -144,91 +153,6 @@
 </div>
 <!-- Commande End -->
 
-<!-- Add Sale Modal -->
-<div class="modal fade" id="addSaleModal" tabindex="-1" aria-labelledby="addSaleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addSaleModalLabel">Ajouter une Nouvelle Commande</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="addSaleForm">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="saleWorker" class="form-label">Travailleur</label>
-                        <select class="form-select" id="saleWorker" required>
-                            <!-- Populate with workers -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="saleClient" class="form-label">Client</label>
-                        <select class="form-select" id="saleClient" required>
-                            <!-- Populate with clients -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="saleItems" class="form-label">Articles</label>
-                        <div id="saleItems">
-                            <!-- Dynamic fields for adding items -->
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="totalAmount" class="form-label">Montant Total</label>
-                        <input type="number" class="form-control" id="totalAmount" step="0.01" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="amountPaid" class="form-label">Montant Payé</label>
-                        <input type="number" class="form-control" id="amountPaid" step="0.01" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Sauvegarder la Commande</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Sale Modal -->
-<div class="modal fade" id="editSaleModal" tabindex="-1" aria-labelledby="editSaleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editSaleModalLabel">Modifier la Commande</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editSaleForm">
-                <div class="modal-body">
-                    <!-- Similar fields as Add Sale Modal -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Sauvegarder les Modifications</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Sale Modal -->
-<div class="modal fade" id="deleteSaleModal" tabindex="-1" aria-labelledby="deleteSaleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteSaleModalLabel">Confirmer la Suppression</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteSale">Supprimer</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Delete All Sales Modal -->
 <div class="modal fade" id="deleteAllSalesModal" tabindex="-1" aria-labelledby="deleteAllSalesModalLabel" aria-hidden="true">
@@ -248,6 +172,125 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const saleItemsContainer = document.getElementById('saleItems');
+    const addItemButton = document.getElementById('addItem');
+
+    addItemButton.addEventListener('click', function () {
+        const newItem = document.createElement('div');
+        newItem.classList.add('d-flex', 'mb-2');
+        
+        newItem.innerHTML = `
+            <select class="form-select me-2" name="produit_id[]" required>
+                <!-- Products will be populated here -->
+            </select>
+            <input type="number" class="form-control" name="quantite[]" placeholder="Quantité" required>
+            <input type="number" class="form-control ms-2" name="prix[]" step="0.01" placeholder="Prix Unitaire" required>
+            <button type="button" class="btn btn-danger ms-2 removeItem">Supprimer</button>
+        `;
+        
+        saleItemsContainer.appendChild(newItem);
+        
+        newItem.querySelector('.removeItem').addEventListener('click', function () {
+            saleItemsContainer.removeChild(newItem);
+        });
+    });
+    
+    // Assuming you have data for clients and products
+    populateClientsAndProducts();
+});
+
+function populateClientsAndProducts() {
+    // Populate clients
+    const clients = [...];  // Replace with actual data
+    const saleClientSelect = document.getElementById('saleClient');
+    clients.forEach(client => {
+        const option = document.createElement('option');
+        option.value = client.id;
+        option.textContent = `${client.nom} ${client.prenom}`;
+        saleClientSelect.appendChild(option);
+    });
+
+    // Populate products
+    const products = [...];  // Replace with actual data
+    document.querySelectorAll('select[name="produit_id[]"]').forEach(select => {
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.nom;
+            select.appendChild(option);
+        });
+    });
+}
+document.getElementById('addSaleForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    
+    fetch('/add-sale/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Commande ajoutée avec succès!');
+            location.reload();
+        } else {
+            alert('Erreur lors de l\'ajout de la commande.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('confirmDeleteAllSales').addEventListener('click', function() {
+        // Send a request to the server to delete all sales
+        $.ajax({
+            url: '{% url "delete_all_sales" %}',  // Replace with your URL for the Django view
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Handle success (e.g., reload the page or show a success message)
+                window.location.reload(); // Refresh the page to reflect the changes
+            },
+            error: function(xhr, status, error) {
+                // Handle error (e.g., show an error message)
+                alert('Une erreur s\'est produite. Veuillez réessayer.');
+            }
+        });
+    });
+});
+</script>
+
 
 <!-- Footer Start -->
 <div class="container-fluid bg-dark text-light footer py-5 mt-5">

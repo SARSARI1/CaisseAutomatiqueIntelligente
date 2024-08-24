@@ -125,3 +125,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Add this at the bottom of your settings.py file
+
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
+MEDIA_URL = '/media/'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT = BASE_DIR / 'media'

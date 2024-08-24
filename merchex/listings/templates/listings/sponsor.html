@@ -119,18 +119,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example Sponsor Row -->
-                        <tr>
-                            <td>Sponsor 1</td>
-                            <td>Contact info</td>
-                            <td><a href="http://example.com">example.com</a></td>
-                            <td><img src="path/to/logo.jpg" alt="Logo" style="width: 100px;"></td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSponsorModal" data-id="1">Modifier</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSponsorModal" data-id="1">Supprimer</button>
-                            </td>
-                        </tr>
-                        <!-- Repeat for other sponsors -->
+                        {% if sponsors %}
+                            {% for sponsor in sponsors %}
+                            <tr>
+                                <td>{{ sponsor.nom }}</td>
+                                <td>{{ sponsor.informations_contact }}</td>
+                                <td><a href="{{ sponsor.site_web }}">{{ sponsor.site_web }}</a></td>
+                                <td><img src="{{ sponsor.logo.url }}" alt="Logo" style="width: 100px;"></td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSponsorModal" data-id="{{ sponsor.id }}" data-nom="{{ sponsor.nom }}" data-informations_contact="{{ sponsor.informations_contact }}" data-site_web="{{ sponsor.site_web }}">Modifier</button>
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSponsorModal" data-id="{{ sponsor.id }}">Supprimer</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">Aucun sponsor à afficher.</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
                 <button class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#deleteAllSponsorsModal">Supprimer Tous les Sponsors</button>
@@ -140,7 +146,6 @@
     </div>
 </div>
 <!-- Sponsors End -->
-
 <!-- Add Sponsor Modal -->
 <div class="modal fade" id="addSponsorModal" tabindex="-1" aria-labelledby="addSponsorModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -149,60 +154,71 @@
                 <h5 class="modal-title" id="addSponsorModalLabel">Ajouter un Nouveau Sponsor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addSponsorForm">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="sponsorName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="sponsorName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="sponsorContact" class="form-label">Informations de Contact</label>
-                        <input type="text" class="form-control" id="sponsorContact" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="sponsorWebsite" class="form-label">Site Web</label>
-                        <input type="url" class="form-control" id="sponsorWebsite">
-                    </div>
-                    <div class="mb-3">
-                        <label for="sponsorLogo" class="form-label">Logo</label>
-                        <input type="file" class="form-control" id="sponsorLogo">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Sauvegarder le Sponsor</button>
-                </div>
-            </form>
+           <form action="{% url 'add_sponsor' %}" method="post" enctype="multipart/form-data" class="p-4">
+    {% csrf_token %}
+
+    <!-- Nom Field -->
+    <div class="mb-3">
+        <label for="{{ form.nom.id_for_label }}" class="form-label">Nom:</label>
+        <input type="text" name="{{ form.nom.name }}" id="{{ form.nom.id_for_label }}" class="form-control" value="{{ form.nom.value|default_if_none:'' }}" />
+    </div>
+
+    <!-- Informations de Contact Field -->
+    <div class="mb-3">
+        <label for="{{ form.informations_contact.id_for_label }}" class="form-label">Informations de Contact:</label>
+        <input type="text" name="{{ form.informations_contact.name }}" id="{{ form.informations_contact.id_for_label }}" class="form-control" value="{{ form.informations_contact.value|default_if_none:'' }}" />
+    </div>
+
+    <!-- Site Web Field -->
+    <div class="mb-3">
+        <label for="{{ form.site_web.id_for_label }}" class="form-label">Site Web:</label>
+        <input type="text" name="{{ form.site_web.name }}" id="{{ form.site_web.id_for_label }}" class="form-control" value="{{ form.site_web.value|default_if_none:'' }}" />
+    </div>
+
+    <!-- Logo Field -->
+    <div class="mb-3">
+        <label for="{{ form.logo.id_for_label }}" class="form-label">Logo:</label>
+        <input type="file" name="{{ form.logo.name }}" id="{{ form.logo.id_for_label }}" class="form-control" />
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="submit" class="btn btn-primary">Sauvegarder le Sponsor</button>
+    </div>
+</form>
+
+            
+            
         </div>
     </div>
 </div>
-
-<!-- Edit Sponsor Modal -->
-<div class="modal fade" id="editSponsorModal" tabindex="-1" aria-labelledby="editSponsorModalLabel" aria-hidden="true">
+ <!-- Edit Sponsor Modal -->
+ <div class="modal fade" id="editSponsorModal" tabindex="-1" aria-labelledby="editSponsorModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editSponsorModalLabel">Modifier le Sponsor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editSponsorForm">
+            <form id="editSponsorForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="modal-body">
-                    <input type="hidden" id="editSponsorId">
+                    <input type="hidden" name="id" id="editSponsorId">
                     <div class="mb-3">
                         <label for="editSponsorName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="editSponsorName" required>
+                        <input type="text" class="form-control" id="editSponsorName" name="nom" required>
                     </div>
                     <div class="mb-3">
                         <label for="editSponsorContact" class="form-label">Informations de Contact</label>
-                        <input type="text" class="form-control" id="editSponsorContact" required>
+                        <input type="text" class="form-control" id="editSponsorContact" name="informations_contact" required>
                     </div>
                     <div class="mb-3">
                         <label for="editSponsorWebsite" class="form-label">Site Web</label>
-                        <input type="url" class="form-control" id="editSponsorWebsite">
+                        <input type="url" class="form-control" id="editSponsorWebsite" name="site_web">
                     </div>
                     <div class="mb-3">
                         <label for="editSponsorLogo" class="form-label">Logo</label>
-                        <input type="file" class="form-control" id="editSponsorLogo">
+                        <input type="file" class="form-control" id="editSponsorLogo" name="logo">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -233,6 +249,121 @@
     </div>
 </div>
 
+<!-- Delete All Sponsors Modal -->
+<div class="modal fade" id="deleteAllSponsorsModal" tabindex="-1" aria-labelledby="deleteAllSponsorsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAllSponsorsModalLabel">Confirmer la Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer tous les sponsors ? Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteAllSponsors">Supprimer Tous</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    var editSponsorModal = document.getElementById('editSponsorModal');
+    var editSponsorForm = document.getElementById('editSponsorForm');
+
+    // Populate modal with sponsor data when shown
+    editSponsorModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var id = button.getAttribute('data-id');
+        var nom = button.getAttribute('data-nom');
+        var informations_contact = button.getAttribute('data-informations_contact');
+        var site_web = button.getAttribute('data-site_web');
+
+        document.querySelector('#editSponsorId').value = id;
+        document.querySelector('#editSponsorName').value = nom;
+        document.querySelector('#editSponsorContact').value = informations_contact;
+        document.querySelector('#editSponsorWebsite').value = site_web;
+    });
+
+    // Handle form submission with AJAX
+    editSponsorForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        var formData = new FormData(editSponsorForm);
+
+        fetch('{% url "edit_sponsor" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reload the page on successful response
+                window.location.reload();
+            } else {
+                // Log errors if any
+                console.error('Error:', response.statusText);
+            }
+        })
+        .catch(error => {
+            // Log any errors that occur during the fetch
+            console.error('Error:', error);
+        });
+    });
+});
+
+
+</script>
+<!-- Include necessary Bootstrap JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+        
+
+        
+
+        // Handle delete button click
+        let deleteSponsorId = null;
+        document.querySelectorAll('button[data-bs-target="#deleteSponsorModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                deleteSponsorId = this.getAttribute('data-id');
+            });
+        });
+
+        document.getElementById('confirmDeleteSponsor').addEventListener('click', function() {
+            if (deleteSponsorId) {
+                fetch("{% url 'delete_sponsor' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ id: deleteSponsorId })
+                })
+                .then(response => window.location.reload())
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Handle delete all button click
+        document.getElementById('confirmDeleteAllSponsors').addEventListener('click', function() {
+            fetch("{% url 'delete_all_sponsors' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => window.location.reload())
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
 <!-- Delete All Sponsors Modal -->
 <div class="modal fade" id="deleteAllSponsorsModal" tabindex="-1" aria-labelledby="deleteAllSponsorsModalLabel" aria-hidden="true">
     <div class="modal-dialog">

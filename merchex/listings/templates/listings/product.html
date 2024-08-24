@@ -115,23 +115,55 @@
                                 <th>Prix</th>
                                 <th>Stock</th>
                                 <th>Description</th>
+                                <th>Image</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Example Product Row -->
-                            <tr>
-                                <td>Produit 1</td>
-                                <td>Catégorie 1</td>
-                                <td>100,00 €</td>
-                                <td>50</td>
-                                <td>Description exemple</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal" data-id="1">Modifier</button>
-                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProductModal" data-id="1">Supprimer</button>
-                                </td>
-                            </tr>
-                            <!-- Repeat for other products -->
+                            {% if products.exists %}
+                                {% for product in products %}
+                                <tr>
+                                    <td>{{ product.nom }}</td>
+                                    <td>{{ product.categorie }}</td>
+                                    <td>{{ product.prix }} DH</td>
+                                    <td>{{ product.quantite_stock }}</td>
+                                    <td>{{ product.description }}</td>
+                                    <td>
+                                        {% if product.image %}
+                                            <img src="{{ product.image.url }}" alt="{{ product.nom }}" style="max-width: 100px;">
+                                        {% else %}
+                                            Pas d'image
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if product.sponsor %}
+                                            {{ product.sponsor.nom }}
+                                        {% else %}
+                                            Aucun sponsor
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#editProductModal"
+        data-id="{{ product.id }}"
+        data-nom="{{ product.nom }}"
+        data-categorie="{{ product.categorie }}"
+        data-prix="{{ product.prix }}"
+        data-quantite_stock="{{ product.quantite_stock }}"
+        data-description="{{ product.description }}"
+        data-sponsor="{{ product.sponsor.id }}"
+        data-image="{{ product.image.url }}">Modifier</button>
+        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteProductModal" data-id="{{ product.id }}">Supprimer</button>
+
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Aucun produit dans la table.</td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
                     <button class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#deleteAllProductsModal">Supprimer Tous les Produits</button>
@@ -141,54 +173,54 @@
         </div>
     </div>
     <!-- Products End -->
-
-    <!-- Add Product Modal -->
+   <!-- Add Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addProductModalLabel">Ajouter un Nouveau Produit</h5>
+                    <h5 class="modal-title" id="addProductModalLabel">Ajouter Nouveau Produit</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="addProductForm">
+                <form method="post" enctype="multipart/form-data" action="{% url 'add_product' %}">
+                    {% csrf_token %}
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="productName" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="productName" required>
+                            <label for="id_nom" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="id_nom" name="nom" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productCategory" class="form-label">Catégorie</label>
-                            <input type="text" class="form-control" id="productCategory" required>
+                            <label for="id_categorie" class="form-label">Catégorie</label>
+                            <input type="text" class="form-control" id="id_categorie" name="categorie" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productPrice" class="form-label">Prix</label>
-                            <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                            <label for="id_prix" class="form-label">Prix</label>
+                            <input type="number" step="0.01" class="form-control" id="id_prix" name="prix" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productStock" class="form-label">Stock</label>
-                            <input type="number" class="form-control" id="productStock" required>
+                            <label for="id_quantite_stock" class="form-label">Stock</label>
+                            <input type="number" class="form-control" id="id_quantite_stock" name="quantite_stock" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="productDescription"></textarea>
+                            <label for="id_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="id_description" name="description"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="productImage" class="form-label">Image</label>
-                            <input type="file" class="form-control" id="productImage">
+                            <label for="id_image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="id_image" name="image">
                         </div>
                         <div class="mb-3">
-                            <label for="productSponsor" class="form-label">Sponsor</label>
-                            <select class="form-select" id="productSponsor">
-                                <!-- Populate with sponsors from the database -->
-                                <option value="">Aucun</option>
-                                <option value="1">Sponsor 1</option>
-                                <option value="2">Sponsor 2</option>
+                            <label for="id_sponsor" class="form-label">Sponsor</label>
+                            <select class="form-select" id="id_sponsor" name="sponsor">
+                                <option value="">Choisissez un sponsor</option>
+                                {% for sponsor in sponsors %}
+                                    <option value="{{ sponsor.id }}">{{ sponsor.nom }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="submit" class="btn btn-primary">Sauvegarder le Produit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
                     </div>
                 </form>
             </div>
@@ -196,77 +228,79 @@
     </div>
 
     <!-- Edit Product Modal -->
-    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProductModalLabel">Modifier le Produit</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="editProductForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="editProductId">
-                        <div class="mb-3">
-                            <label for="editProductName" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="editProductName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductCategory" class="form-label">Catégorie</label>
-                            <input type="text" class="form-control" id="editProductCategory" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductPrice" class="form-label">Prix</label>
-                            <input type="number" class="form-control" id="editProductPrice" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductStock" class="form-label">Stock</label>
-                            <input type="number" class="form-control" id="editProductStock" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="editProductDescription"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductImage" class="form-label">Image</label>
-                            <input type="file" class="form-control" id="editProductImage">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editProductSponsor" class="form-label">Sponsor</label>
-                            <select class="form-select" id="editProductSponsor">
-                                <!-- Populate with sponsors from the database -->
-                                <option value="">Aucun</option>
-                                <option value="1">Sponsor 1</option>
-                                <option value="2">Sponsor 2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="submit" class="btn btn-primary">Mettre à Jour le Produit</button>
-                    </div>
-                </form>
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Modifier le Produit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
-    </div>
-
-    <!-- Delete Product Modal -->
-    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteProductModalLabel">Confirmer la Suppression</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+            <form id="editProductForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.</p>
+                    <input type="hidden" name="id" id="editProductId">
+                    <div class="mb-3">
+                        <label for="editProductName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="editProductName" name="nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductCategory" class="form-label">Catégorie</label>
+                        <input type="text" class="form-control" id="editProductCategory" name="categorie" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductPrice" class="form-label">Prix</label>
+                        <input type="number" class="form-control" id="editProductPrice" name="prix" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductStock" class="form-label">Stock</label>
+                        <input type="number" class="form-control" id="editProductStock" name="quantite_stock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editProductDescription" name="description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductImage" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="editProductImage" name="image">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProductSponsor" class="form-label">Sponsor</label>
+                        <select class="form-select" id="editProductSponsor" name="sponsor">
+                            <option value="">Choisissez un sponsor</option>
+                                {% for sponsor in sponsors %}
+                                    <option value="{{ sponsor.id }}">{{ sponsor.nom }}</option>
+                                {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteProduct">Supprimer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Mettre à Jour le Produit</button>
                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+   <!-- Delete Product Modal -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProductModalLabel">Confirmer la Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteProduct">Supprimer</button>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Delete All Products Modal -->
     <div class="modal fade" id="deleteAllProductsModal" tabindex="-1" aria-labelledby="deleteAllProductsModalLabel" aria-hidden="true">
@@ -287,53 +321,135 @@
         </div>
     </div>
 
-    <!-- JavaScript for handling modals and actions -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const editProductModal = document.getElementById('editProductModal');
-            const addProductForm = document.getElementById('addProductForm');
-            const editProductForm = document.getElementById('editProductForm');
-            let productIdToDelete;
-
-            addProductForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                // Handle adding product here
-            });
-
-            editProductForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                // Handle editing product here
-            });
-
-            // Example of setting data for edit modal
-            editProductModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                productIdToEdit = button.getAttribute('data-id');
-                // Fetch product data and populate the form
-            });
-
-            // Confirm delete single product
-            document.getElementById('confirmDeleteProduct').addEventListener('click', function () {
-                if (productIdToDelete) {
-                    // Handle deleting the product
+        document.addEventListener('DOMContentLoaded', function() {
+            var editProductModal = document.getElementById('editProductModal');
+            var editProductForm = document.getElementById('editProductForm');
+        
+            // Populate modal with product data when shown
+            editProductModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var id = button.getAttribute('data-id');
+                var nom = button.getAttribute('data-nom');
+                var categorie = button.getAttribute('data-categorie');
+                var prix = button.getAttribute('data-prix');
+                var quantite_stock = button.getAttribute('data-quantite_stock');
+                var description = button.getAttribute('data-description');
+                var sponsor = button.getAttribute('data-sponsor');
+                var image = button.getAttribute('data-image');
+        
+                document.querySelector('#editProductId').value = id;
+                document.querySelector('#editProductName').value = nom;
+                document.querySelector('#editProductCategory').value = categorie;
+                document.querySelector('#editProductPrice').value = prix;
+                document.querySelector('#editProductStock').value = quantite_stock;
+                document.querySelector('#editProductDescription').value = description;
+                document.querySelector('#editProductSponsor').value = sponsor;
+        
+                // Optionally set the image preview
+                if (image) {
+                    // Set image preview URL
+                    // Example: document.querySelector('#editProductImagePreview').src = image;
                 }
-                $('#deleteProductModal').modal('hide');
             });
-
-            // Confirm delete all products
-            document.getElementById('confirmDeleteAllProducts').addEventListener('click', function () {
-                // Handle deleting all products
-                $('#deleteAllProductsModal').modal('hide');
-            });
-
-            // Set productIdToDelete before showing delete modal
-            document.querySelectorAll('[data-bs-target="#deleteProductModal"]').forEach(button => {
-                button.addEventListener('click', function () {
-                    productIdToDelete = this.getAttribute('data-id');
+        
+            // Handle form submission with AJAX
+            editProductForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+                var formData = new FormData(editProductForm);
+        
+                fetch('{% url "edit_product" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page on successful response
+                        window.location.reload();
+                    } else {
+                        // Log errors if any
+                        console.error('Error:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    // Log any errors that occur during the fetch
+                    console.error('Error:', error);
                 });
             });
         });
-    </script>
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var deleteProductModal = document.getElementById('deleteProductModal');
+                var confirmDeleteButton = document.getElementById('confirmDeleteProduct');
+                var productId = null;
+        
+                // Capture product ID when the delete modal is shown
+                deleteProductModal.addEventListener('show.bs.modal', function(event) {
+                    var button = event.relatedTarget;
+                    productId = button.getAttribute('data-id');
+                });
+        
+                // Handle confirm delete button click
+                confirmDeleteButton.addEventListener('click', function() {
+                    if (productId) {
+                        fetch(`/delete-product/${productId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                'id': productId
+                            })
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.reload(); // Reload page to reflect changes
+                            } else {
+                                console.error('Error:', response.statusText);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    }
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var deleteAllProductsModal = document.getElementById('deleteAllProductsModal');
+                var confirmDeleteAllButton = document.getElementById('confirmDeleteAllProducts');
+        
+                // Handle confirm delete all button click
+                confirmDeleteAllButton.addEventListener('click', function() {
+                    fetch('/delete-all-products/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload(); // Reload page to reflect changes
+                        } else {
+                            console.error('Error:', response.statusText);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        </script>
+        
+        
 
     <!-- Bootstrap JS and other necessary scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
