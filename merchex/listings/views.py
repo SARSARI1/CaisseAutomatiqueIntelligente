@@ -17,9 +17,7 @@ def login(request):
    
     return render(request, 'listings/login.html')
 
-def paiement(request):
-   
-    return render(request, 'listings/paiement.html')
+
 
 
 def commande(request):
@@ -335,7 +333,10 @@ def delete_all_sales(request):
 
 
 #------------------------------  admin views -----------------------
-
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Admin
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import Admin
@@ -348,7 +349,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Admin
 from django.contrib.auth.hashers import make_password
-
 def add_admin(request):
     if request.method == 'POST':
         nom = request.POST.get('nom')
@@ -357,14 +357,186 @@ def add_admin(request):
         password = request.POST.get('password')
         image = request.FILES.get('image')
 
-        # Hash the password before saving
+        # Hasher le mot de passe avant de sauvegarder
         hashed_password = make_password(password)
 
-        # Create and save the new admin
+        # Créer et sauvegarder le nouvel admin
         admin = Admin(nom=nom, prenom=prenom, email=email, password=hashed_password, image=image)
         admin.save()
 
-        messages.success(request, 'Admin added successfully!')
+        messages.success(request, 'Administrateur ajouté avec succès!')
         return redirect('admin_list')
 
     return render(request, 'listings/admin.html')
+
+def edit_admin(request):
+    if request.method == 'POST':
+        admin_id = request.POST.get('admin_id')
+        admin = get_object_or_404(Admin, id=admin_id)
+        
+        admin.nom = request.POST.get('nom')
+        admin.prenom = request.POST.get('prenom')
+        admin.email = request.POST.get('email')
+        if request.POST.get('password'):
+            admin.password = request.POST.get('password')  # N'oubliez pas de hasher le mot de passe
+        if request.FILES.get('image'):
+            admin.image = request.FILES.get('image')
+        
+        admin.save()
+        messages.success(request, 'Administrateur mis à jour avec succès!')
+        return redirect('admin_list')
+
+def delete_admin(request):
+    if request.method == 'POST':
+        admin_id = request.POST.get('admin_id')
+        admin = get_object_or_404(Admin, id=admin_id)
+        admin.delete()
+        messages.success(request, 'Administrateur supprimé avec succès!')
+        return redirect('admin_list')
+
+def delete_all_admins(request):
+    if request.method == 'POST':
+        Admin.objects.all().delete()
+        messages.success(request, 'Tous les enregistrements administratifs ont été supprimés avec succès!')
+        return redirect('admin_list')
+
+
+
+#--------------------------------- paiment pages -----------------------------------------------------
+
+def paiement(request):
+    produits = Produit.objects.all()
+    clients = Client.objects.all()
+    
+    context = {
+        'produits': produits,
+        'clients': clients,
+    }
+   
+    return render(request, 'listings/paiement.html',context)
+
+
+#-------------------------------------------------------- Login page traitement --------------------------------
+
+import cv2
+import numpy as np
+import face_recognition
+import os
+
+# Load images from the database (folder path)
+path = 'media/images_admins'
+images = []
+classNames = []
+personsList = os.listdir(path)
+
+# Load and store images and corresponding class names
+for cl in personsList:
+    curPersonn = cv2.imread(f'{path}/{cl}')
+    images.append(curPersonn)
+    classNames.append(os.path.splitext(cl)[0])
+
+# Function to encode images
+def findEncodings(images):
+    encodeList = []
+    for img in images:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        encode = face_recognition.face_encodings(img)[0]
+        encodeList.append(encode)
+    return encodeList
+
+# Encode known images
+encodeListKnown = findEncodings(images)
+print('Encoding Complete')
+
+# Function to compare a given image to the known database
+def compare_image_to_database(image_path):
+    # Load the image taken from the browser
+    img = cv2.imread(image_path)
+    
+    # Resize the image and convert to RGB
+    imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+    imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
+
+    # Find face locations and encodings in the image
+    faceCurentFrame = face_recognition.face_locations(imgS)
+    encodeCurentFrame = face_recognition.face_encodings(imgS, faceCurentFrame)
+
+    # If no face is detected, return False
+    if not encodeCurentFrame:
+        return False
+
+    # Compare the detected face to known encodings
+    for encodeFace in encodeCurentFrame:
+        matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
+        faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
+
+        # Find the best match index
+        matchIndex = np.argmin(faceDis)
+
+        # Return True if a match is found
+        if matches[matchIndex]:
+            return True
+            
+
+    return False
+
+
+from listings.models import Admin  # Adjust the import based on your app structure
+
+def check_admin_credentials(email, password):
+    try:
+        # Query the Admin model to check if an admin with the given nom and password exists
+        admin = Admin.objects.get(email=email, password=password)
+        return True
+    except Admin.DoesNotExist:
+        return False
+
+#--------------------------------- Verfication of credentials -------------------------------------
+#getting user entrey : image , email , password
+from django.contrib import messages
+import os
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
+import base64  # Add this line
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        image_data = request.POST.get('image')
+
+        # Step 1: Convert the base64 image data to an image file
+        if image_data:
+            # Extract the base64 string (remove "data:image/png;base64," prefix)
+            image_data = image_data.split(',')[1]
+
+            # Decode the base64 string into binary data
+            image_binary = base64.b64decode(image_data)
+
+            # Save the image temporarily
+            image_path = os.path.join(settings.MEDIA_ROOT, 'temp_face_image.png')
+            with open(image_path, 'wb') as f:
+                f.write(image_binary)
+
+            # Step 2: Handle image verification
+            if not compare_image_to_database(image_path):
+                # If image verification fails, remove temp image and add an error message
+                os.remove(image_path)  # Clean up the temporary file
+                messages.error(request, "Votre visage n'a pas été reconnu.")
+                return redirect('login')  # Redirect to the login page
+
+            # Step 3: Handle credentials if image is verified
+            os.remove(image_path)  # Clean up the temporary file after verification
+
+            if check_admin_credentials(email, password):
+                # If credentials are correct, redirect to payment page
+                return redirect('paiement')  # Redirect to the payment page
+            else:
+                # If credentials are incorrect, add an error message
+                messages.error(request, 'Identifiants incorrects.')
+                return redirect('login')  # Redirect to the login page
+
+    # Default behavior: render login page if not a POST request
+    return render(request, 'listings/login.html')

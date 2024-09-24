@@ -117,7 +117,23 @@
     </div>
     <!-- Full Screen Search End -->
 
-
+       <!-- Message Alerts -->
+       <div>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == "error" %}
+                    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                {% elif message.tags == "success" %}
+                    <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
+                {% else %}
+                    <div class="alert alert-info alert-dismissible fade show mt-2" role="alert">
+                {% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+      </div>
   
       <!-- À Propos Début -->
       <div class="container-fluid py-5">
@@ -133,7 +149,7 @@
                 <!-- Form Column -->
                 <div class="col-lg-6">
                     <div class="d-flex flex-column h-50 justify-content-center">
-                        <form id="loginForm" method="POST" action="">
+                        <form id="loginForm" method="POST" action="{% url 'login' %}">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label class="form-label">Take a Picture</label>

@@ -27,122 +27,189 @@
 
  <!-- Customized Bootstrap Stylesheet -->
  <link href="{% static 'listings/css/bootstrap.min.css' %}" rel="stylesheet">
-
+ <style>
+    .product-list, .client-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .product-item, .client-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .product-item img, .client-item img {
+        max-height: 100px;
+        margin-right: 10px;
+    }
+    .client-list img {
+        max-height: 50px;
+        margin-right: 10px;
+    }
+    .custom-checkbox .custom-control-label::before {
+        border-radius: 0;
+    }
+    .custom-checkbox .custom-control-label::after {
+        border-radius: 0;
+    }
+</style>
  <!-- Template Stylesheet -->
  <link href="{% static 'listings/css/style.css' %}" rel="stylesheet">
 </head>
 
 
-
-
 <body>
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
+    
+
+    <!-- Navbar Start -->
+    <div class="container-fluid sticky-top">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark p-0">
+                <a href="{% url 'product' %}" class="navbar-brand">
+                    <h1 class="text-white">AI<span class="text-dark">.</span>Pay</h1>
+                </a>
+                <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto">
+                        <a href="{% url 'about' %}" class="nav-item nav-link">Accueil</a>
+                        <a href="{% url 'product' %}" class="nav-item nav-link">Produits</a>
+                        <a href="{% url 'client' %}" class="nav-item nav-link">Clients</a>
+                        <a href="{% url 'sponsor' %}" class="nav-item nav-link">Sponsors</a>
+                        <a href="{% url 'commande' %}" class="nav-item nav-link">Commande</a>
+                        <a href="{% url 'paiement' %}" class="nav-item nav-link active">Paiement</a>
+                    </div>
+                </div>
+            </nav>
         </div>
     </div>
-    <!-- Spinner End -->
+    <!-- Navbar End -->
 
-   <!-- Navbar Start -->
-   <div class="container-fluid sticky-top">
-    <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-dark p-0">
-            <a href="{% url 'product' %}" class="navbar-brand">
-                <h1 class="text-white">AI<span class="text-dark">.</span>Pay</h1>
-            </a>
-            <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto">
-                    <a href="{% url 'about' %}" class="nav-item nav-link">Accueil</a>
-                    <a href="{% url 'product' %}" class="nav-item nav-link">Produits</a>
-                    <a href="{% url 'client' %}" class="nav-item nav-link">Clients</a>
-                    <a href="{% url 'sponsor' %}" class="nav-item nav-link">Sponsors</a>
-                    <a href="{% url 'commande' %}" class="nav-item nav-link">Commande</a>
-                    <a href="{% url 'paiement' %}" class="nav-item nav-link active">Paiement</a>
+    <!-- Hero Start -->
+    <div class="container-fluid pt-5 bg-primary hero-header mb-5">
+        <div class="container pt-5">
+            <div class="row g-5 pt-5">
+                <div class="col-lg-6 align-self-center text-center text-lg-start mb-lg-5">
+                    <div class="btn btn-sm border rounded-pill text-white px-3 mb-3 animated slideInRight">AI.Tech</div>
+                    <h1 class="display-4 text-white mb-4 animated slideInRight">Gérez vos paiements efficacement</h1>
                 </div>
-            </div>
-        </nav>
-    </div>
-</div>
-<!-- Navbar End -->
-
-<!-- Hero Start -->
-<div class="container-fluid pt-5 bg-primary hero-header mb-5">
-    <div class="container pt-5">
-        <div class="row g-5 pt-5">
-            <div class="col-lg-6 align-self-center text-center text-lg-start mb-lg-5">
-                <div class="btn btn-sm border rounded-pill text-white px-3 mb-3 animated slideInRight">AI.Tech</div>
-                <h1 class="display-4 text-white mb-4 animated slideInRight">Gérez vos paiements efficacement</h1>
-            </div>
-            <div class="col-lg-6 align-self-end text-center text-lg-end">
-                <img class="img-fluid" src="{% static 'listings/img/payment-hero-img.png' %}" alt="">
+                <div class="col-lg-6 align-self-end text-center text-lg-end">
+                    <img class="img-fluid" src="{% static 'listings/img/payment-hero-img.png' %}" alt="">
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Hero End -->
-<!-- Products Start -->
-<div class="container-fluid py-5">
-    <div class="container">
-        <div class="row">
-            <!-- Sidebar Menu Start -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <div class="list-group">
-                    <a href="{% url 'product' %}" class="list-group-item list-group-item-action ">Produits</a>
-                    <a href="{% url 'client' %}" class="list-group-item list-group-item-action">Clients</a>
-                    <a href="{% url 'sponsor' %}" class="list-group-item list-group-item-action">Sponsors</a>
-                    <a href="{% url 'commande' %}" class="list-group-item list-group-item-action">Commande</a>
-                    <a href="{% url 'paiement' %}" class="list-group-item list-group-item-action active">Paiement</a>
+    <!-- Hero End -->
+
+    <!-- Products Start -->
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar Menu Start -->
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <div class="list-group">
+                        <a href="{% url 'product' %}" class="list-group-item list-group-item-action ">Produits</a>
+                        <a href="{% url 'client' %}" class="list-group-item list-group-item-action">Clients</a>
+                        <a href="{% url 'sponsor' %}" class="list-group-item list-group-item-action">Sponsors</a>
+                        <a href="{% url 'commande' %}" class="list-group-item list-group-item-action">Commande</a>
+                        <a href="{% url 'paiement' %}" class="list-group-item list-group-item-action active">Paiement</a>
+                    </div>
                 </div>
+                <!-- Sidebar Menu End -->
+
+                <!-- Product Table Start -->
+                <div class="col-lg-9 col-md-8">
+                    <!-- Product Search and Selection -->
+                   <!-- Product Search and Selection -->
+                   <div class="mb-4">
+                    <label for="productSearch" class="form-label">Rechercher des Produits</label>
+                    <input type="text" id="productSearch" class="form-control" placeholder="Rechercher...">
+                </div>
+                    <div class="mb-4">
+                        <label for="productSelect" class="form-label">Sélectionnez les Produits</label>
+                        <div class="product-list">
+                            <ul id="productList" class="list-group">
+                                {% for produit in produits %}
+                                <li class="list-group-item product-item">
+                                    <input type="checkbox" class="product-checkbox" data-price="{{ produit.prix }}"> 
+                                    <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+                                    <span>{{ produit.nom }} - {{ produit.prix }} DH</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                   <!-- Client Selection -->
+                    <div class="mb-4">
+                        <label for="clientSearch" class="form-label">Rechercher un Client</label>
+                        <input type="text" id="clientSearch" class="form-control" placeholder="Rechercher...">
+                    </div>
+                    <div class="mb-4">
+                        <label for="clientSelect" class="form-label">Sélectionnez le Client</label>
+                        <div class="client-list">
+                            <ul id="clientList" class="list-group">
+                                {% for client in clients %}
+                                <li class="list-group-item client-item">
+                                    <input type="radio" name="client" class="client-radio" value="{{ client.id }}"> 
+                                    {% if client.image %}
+                                    <img src="{{ client.image.url }}" alt="{{ client.nom }}">
+                                    {% endif %}
+                                    <span>{{ client.nom }} {{ client.prenom }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Total Amount Display -->
+                    <div class="mb-4">
+                        <h4>Total: <span id="totalAmount">0.00 DH</span></h4>
+                    </div>
+
+                    <!-- Payment Options -->
+                    
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualCalculationModal">Entrer Prix Manuellement</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modelCalculationModal">Calculer avec le Modèle</button>
+                </div>
+                <!-- Product Table End -->
             </div>
-            <!-- Sidebar Menu End -->
-
-            <!-- Product Table Start -->
-            <div class="col-lg-9 col-md-8">
-
-
-
-                <!-- Product Selection -->
-                <div class="mb-4">
-                    <label for="productSelect" class="form-label">Sélectionnez les Produits</label>
-                    <select class="form-select" id="productSelect" multiple>
-                        <!-- Populate with products from the database -->
-                        <option value="1">Produit 1</option>
-                        <option value="2">Produit 2</option>
-                    </select>
-                </div>
-
-                <!-- Client Selection -->
-                <div class="mb-4">
-                    <label for="clientSelect" class="form-label">Sélectionnez le Client</label>
-                    <select class="form-select" id="clientSelect">
-                        <!-- Populate with clients from the database -->
-                        <option value="1">Client 1</option>
-                        <option value="2">Client 2</option>
-                    </select>
-                </div>
-
-                <!-- Total Amount Display -->
-                <div class="mb-4">
-                    <h4>Total: <span id="totalAmount">0.00 €</span></h4>
-                </div>
-
-                <!-- Payment Options -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualCalculationModal">Entrer Prix Manuellement</button>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modelCalculationModal">Calculer avec le Modèle</button>
- 
-                </div>
-            <!-- Product Table End -->
         </div>
     </div>
-</div>
-<!-- Products End -->
+    <!-- Products End -->
 
 
-<!-- Manual Calculation Modal -->
+    <!-- Model Calculation Modal -->
+    <div class="modal fade" id="modelCalculationModal" tabindex="-1" aria-labelledby="modelCalculationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modelCalculationModalLabel">Calculer avec le Modèle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Veuillez télécharger les images des pièces et des billets.</p>
+                    <div class="mb-3">
+                        <label for="coinsImage" class="form-label">Image des Pièces</label>
+                        <input type="file" class="form-control" id="coinsImage" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="billsImage" class="form-label">Image des Billets</label>
+                        <input type="file" class="form-control" id="billsImage" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modelReturn" class="form-label">Retour (calculé automatiquement)</label>
+                        <input type="text" class="form-control" id="modelReturn" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary" id="calculateModel">Calculer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+ <!-- Manual Calculation Modal -->
 <div class="modal fade" id="manualCalculationModal" tabindex="-1" aria-labelledby="manualCalculationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -153,106 +220,158 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="manualPrice" class="form-label">Prix Entré par le Client</label>
-                    <input type="number" class="form-control" id="manualPrice" step="0.01">
+                    <input type="number" class="form-control" id="manualPrice" step="0.01" placeholder="Entrez le prix">
                 </div>
                 <div class="mb-3">
                     <label for="manualReturn" class="form-label">Retour (calculé automatiquement)</label>
-                    <input type="number" class="form-control" id="manualReturn" step="0.01" readonly>
+                    <input type="text" class="form-control" id="manualReturn" step="0.01" readonly>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="calculateManual">Calculer</button>
+
             </div>
         </div>
     </div>
 </div>
-
-<!-- Model Calculation Modal -->
-<div class="modal fade" id="modelCalculationModal" tabindex="-1" aria-labelledby="modelCalculationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modelCalculationModalLabel">Calculer avec le Modèle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Veuillez télécharger les images des pièces et des billets.</p>
-                <div class="mb-3">
-                    <label for="coinsImage" class="form-label">Image des Pièces</label>
-                    <input type="file" class="form-control" id="coinsImage" accept="image/*">
-                </div>
-                <div class="mb-3">
-                    <label for="billsImage" class="form-label">Image des Billets</label>
-                    <input type="file" class="form-control" id="billsImage" accept="image/*">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="processModel">Traitement</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- JavaScript for handling modals and actions -->
+<!-- JavaScript -->
+<script src="{% static 'listings/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'listings/js/jquery.min.js' %}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const manualPriceInput = document.getElementById('manualPrice');
-        const manualReturnInput = document.getElementById('manualReturn');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update total amount
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+        const totalAmountElement = document.getElementById('totalAmount');
 
-        document.getElementById('calculateManual').addEventListener('click', function () {
-            const totalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace(' €', ''));
-            const manualPrice = parseFloat(manualPriceInput.value);
-
-            if (!isNaN(manualPrice)) {
-                const returnAmount = manualPrice - totalAmount;
-                manualReturnInput.value = returnAmount.toFixed(2) + ' €';
-            }
+        productCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                let totalAmount = 0;
+                productCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        totalAmount += parseFloat(checkbox.getAttribute('data-price')) || 0;
+                    }
+                });
+                totalAmountElement.textContent = totalAmount.toFixed(2) + ' DH';
+            });
         });
 
-        document.getElementById('processModel').addEventListener('click', function () {
-            // Handle model processing here
+        // Manual calculation with real-time update
+        const manualPriceInput = document.getElementById('manualPrice');
+        const manualReturnInput = document.getElementById('manualReturn');
+        const totalAmountInModal = document.getElementById('totalAmountInModal');
+        const calculateManualButton = document.getElementById('calculateManual');
+
+        // Function to update return amount
+        function updateManualReturn() {
+            const totalAmount = parseFloat(totalAmountElement.textContent.replace(' DH', '')) || 0;
+            const manualPrice = parseFloat(manualPriceInput.value) || 0;
+            const returnAmount = manualPrice - totalAmount;
+            manualReturnInput.value = returnAmount.toFixed(2) + ' DH';
+        }
+
+        // Set initial total amount in modal
+        function updateTotalAmountInModal() {
+            totalAmountInModal.textContent = totalAmountElement.textContent;
+        }
+
+        manualPriceInput.addEventListener('input', function() {
+            updateManualReturn();
+        });
+
+        calculateManualButton.addEventListener('click', function() {
+            updateManualReturn();
+        });
+
+        // Update the total amount when the modal opens
+        const manualCalculationModal = document.getElementById('manualCalculationModal');
+        manualCalculationModal.addEventListener('shown.bs.modal', function() {
+            updateTotalAmountInModal();
+        });
+
+        // Model calculation (Placeholder, you may adjust as needed)
+        const modelReturnInput = document.getElementById('modelReturn');
+        const calculateModelButton = document.getElementById('calculateModel');
+
+        calculateModelButton.addEventListener('click', function() {
+            const totalAmount = parseFloat(totalAmountElement.textContent.replace(' DH', '')) || 0;
+
+            // Placeholder for actual image processing
+            const modelReturnAmount = 0; // Replace this with actual calculation logic
+            modelReturnInput.value = modelReturnAmount.toFixed(2) + ' DH';
+        });
+
+         
+    });
+</script>
+<!-- Ensure this script tag is at the end of the body or included correctly -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality for products
+        const productSearchInput = document.getElementById('productSearch');
+        const productList = document.getElementById('productList');
+
+        productSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const items = productList.querySelectorAll('.product-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Search functionality for clients
+        const clientSearchInput = document.getElementById('clientSearch');
+        const clientList = document.getElementById('clientList');
+
+        clientSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const items = clientList.querySelectorAll('.client-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
         });
     });
 </script>
 
+
+<script src="{% static 'listings/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'listings/js/jquery.min.js' %}"></script>
+<script src="{% static 'listings/js/bootstrap.bundle.min.js' %}"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
 <!-- Bootstrap JS and other necessary scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+
+<!-- Bootstrap JS and other necessary scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top pt-2"><i class="bi bi-arrow-up"></i></a>
+
+
+
 <!-- JavaScript Libraries -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'listings/lib/wow/wow.min.js' %}"></script>
 <script src="{% static 'listings/lib/easing/easing.min.js' %}"></script>
 <script src="{% static 'listings/lib/waypoints/waypoints.min.js' %}"></script>
 <script src="{% static 'listings/lib/counterup/counterup.min.js' %}"></script>
 <script src="{% static 'listings/lib/owlcarousel/owl.carousel.min.js' %}"></script>
 
-
-    <!-- Bootstrap JS and other necessary scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-    <!-- Bootstrap JS and other necessary scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top pt-2"><i class="bi bi-arrow-up"></i></a>
-
-
-    
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'listings/lib/wow/wow.min.js' %}"></script>
-    <script src="{% static 'listings/lib/easing/easing.min.js' %}"></script>
-    <script src="{% static 'listings/lib/waypoints/waypoints.min.js' %}"></script>
-    <script src="{% static 'listings/lib/counterup/counterup.min.js' %}"></script>
-    <script src="{% static 'listings/lib/owlcarousel/owl.carousel.min.js' %}"></script>
-
-    <!-- Template Javascript -->
-    <script src="{% static 'listings/js/main.js' %}"></script>
+<!-- Template Javascript -->
+<script src="{% static 'listings/js/main.js' %}"></script>
+   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 
 </html>

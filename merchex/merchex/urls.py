@@ -13,7 +13,7 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-     path('login/', views.login, name="login"),
+    path('login/', views.login_view, name="login"),  # Correct this line
     path('about/', views.about, name="about"),
     path('product/', views.product, name="product"),
     path('client/', views.client, name="client"),
@@ -48,6 +48,9 @@ urlpatterns = [
     path('delete-all-sales/', views.delete_all_sales, name='delete_all_sales'),
     path('admin-management/', views.admin_list, name='admin_list'),
     path('admin-add/', views.add_admin, name='add_admin'),
+    path('edit-admin/', views.edit_admin, name='edit_admin'),
+    path('delete-admin/', views.delete_admin, name='delete_admin'),
+    path('delete-all-admins/', views.delete_all_admins, name='delete_all_admins'),
 
 ]
 # Add media URL patterns if in development
