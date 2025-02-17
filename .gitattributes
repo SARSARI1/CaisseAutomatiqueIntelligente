@@ -1,0 +1,9 @@
+# Assurez-vous que les fichiers Python utilisent des fins de ligne LF
+*.py text eol=lf
+*.ipynb text eol=lf
+
+# Assurez-vous que les fichiers XML utilisent des fins de ligne LF
+*.xml text eol=lf
+
+# Assurez-vous que d'autres fichiers texte utilisent des fins de ligne LF
+*.txt text eol=lf
